@@ -1,108 +1,77 @@
 # Amazon Trending Products Scraper
 
-A browser automation agent that extracts the top 5 trending products from Amazon using Google's Gemini language model and Browser-Use library.
+A browser automation agent using the [browser-use](https://github.com/browser-use/browser-use) library and Google's Gemini model to extract Amazon's top trending products.
 
 ## Features
 
-- Automatically navigates to Amazon's Best Sellers page
-- Extracts product names and URLs
-- Saves results in JSON format
-- Uses Google's Gemini 2.0 Flash model for AI-powered web interaction
-- Headless browser capabilities
+- Utilizes **browser-use** for reliable browser automation.
+- Leverages Google's Gemini 2.0 Flash model for AI-powered web interaction.
+- Extracts product names and URLs from Amazon's Best Sellers.
+- Saves structured JSON output.
+- Headless browser capabilities via Playwright.
+
+## Technologies
+
+- [browser-use](https://github.com/browser-use/browser-use) (v0.2.0+).
+- Google Gemini Language Model.
+- Playwright browser automation.
+- Pydantic data validation.
 
 ## Prerequisites
 
 - Python 3.11+
-- Google Gemini API key (free tier available)
-- Windows 10 with VS Code (cross-platform compatible)
-- Playwright browsers installed
+- Google Gemini API key ([free tier available](https://aistudio.google.com/app/apikey)).
+- Playwright browsers installed.
+- Windows/macOS/Linux with VS Code.
 
 ## Installation
 
-1. **Create and activate virtual environment**
-```powershell
-uv venv --python 3.11
-.\.venv\Scripts\activate
-Install dependencies
+### 1. Set up a virtual environment
 
-powershell
+```bash
+python -m venv .venv
+source .venv/bin/activate  # Linux/Mac
+.\.venv\Scripts\activate  # Windows
+```
 
-uv pip install browser-use langchain-google-genai python-dotenv pydantic
+### 2. Install dependencies
+
+```bash
+pip install browser-use langchain-google-genai python-dotenv pydantic
 playwright install
-Configuration
-Create .env file in project root:
+```
 
-env
+### 3. Configure API keys
 
+Create a `.env` file in the project root and add your Gemini API key:
+
+```env
 GEMINI_API_KEY=your_api_key_here
-Get Gemini API key
+```
 
-Usage
-Run the scraper:
+## Usage
 
-powershell
+### Run the browser-use agent
 
+```bash
 python amazon_agent.py
-Output will be saved to:
+```
 
-json
+The output will be saved as `amazon_trending_products.json` in the project directory.
 
-amazon_trending_products.json
-Sample Output:
+## browser-use Configuration
 
-json
+The agent uses the following key `browser-use` features:
 
-{
-  "products": [
-    {
-      "product_name": "Amazon Basics AAA 1.5 Volt Performance Alkaline Batteries",
-      "product_url": "https://www.amazon.com/dp/B00LH3DMUO"
-    },
-    {
-      "product_name": "Echo Dot (5th Gen) | Smart speaker with Alexa",
-      "product_url": "https://www.amazon.com/dp/B09B8V1LZ3"
-    }
-  ]
-}
-Customization Options
-Change target URL
-Modify the URL in amazon_agent.py:
+- **Controller**: For action management and validation.
+- **Agent History**: Tracks execution steps and results.
+- **Browser Context**: Manages browser sessions.
+- **Vision Capabilities**: Enabled by default for improved element detection.
 
-python
+### Example Configuration
 
-task = "Go to Amazon's Best Sellers page (https://www.amazon.com/Best-Sellers/zgbs)..."
-Adjust output format
-Modify the Product model in amazon_agent.py:
-
-python
-
-class Product(BaseModel):
-    product_name: str
-    product_url: str
-    # Add new fields
-    price: Optional[str]
-    rating: Optional[float]
-Switch Gemini model
-Available options: gemini-2.0-flash-exp (fast) or gemini-pro (more capable)
-
-python
-
-llm = ChatGoogleGenerativeAI(
-    model='gemini-pro',
-    api_key=os.getenv('GEMINI_API_KEY')
-)
-Troubleshooting
-Common Issues:
-
-Amazon blocking requests:
-
-Add headless=False to BrowserConfig
-
-Increase page load wait times
-
-python
-
-from browser_use import BrowserConfig
+```python
+from browser_use import BrowserConfig, BrowserContextConfig
 
 agent = Agent(
     task=task,
@@ -111,16 +80,40 @@ agent = Agent(
     browser_config=BrowserConfig(
         headless=False,
         new_context_config=BrowserContextConfig(
-            wait_for_network_idle_page_load_time=3.0
+            browser_window_size={"width": 1600, "height": 900}
         )
     )
 )
-API key errors: Verify .env file formatting and key validity
+```
 
-Element detection failures: Try different Gemini model version
+## Customization
 
-Disclaimer
-This project is for educational purposes only. Always respect website terms of service and robots.txt files. Consider adding delays between requests to avoid overwhelming target servers.
+### Adjust Extraction Logic
 
-License
-MIT License
+You can modify the `amazon_agent.py` script to include additional fields like current price:
+
+```python
+class Product(BaseModel):
+    product_name: str
+    product_url: str
+    current_price: str  # New field
+```
+
+## Limitations
+
+- Requires careful configuration to avoid Amazon bot detection.
+- Dependent on Amazon's page structure remaining consistent.
+- Google Gemini model costs may apply after free quota usage.
+
+## Support
+
+For issues related to `browser-use`, consult the official [documentation](https://docs.browser-use.com/introduction).
+
+## Disclaimer
+
+This project is for educational purposes only. Respect website terms of service and robots.txt files. Add delays between requests to avoid overwhelming servers.
+
+## License
+
+This project is licensed under the MIT License.
+
